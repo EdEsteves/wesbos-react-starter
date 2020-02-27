@@ -4,12 +4,44 @@ import Inventory from './Inventory';
 import Order from './Order';
 import Fish from './Fish';
 
+import base from '../base'
+
 import sampleFishes from '../sample-fishes'
 
 class App extends Component {
   state = {
     fishes: {},
     order: {}
+  }
+
+  componentDidMount(){
+    const { params } = this.props.match;
+    // first reinstate our localstorage
+    const localStorageRef = localStorage.getItem(params.storeId)
+    if(localStorageRef){
+      this.setState({ order: JSON.parse(localStorageRef)})
+    }
+    this.ref = base.syncState(`${params.storeId}/fishes`, {
+      context: this,
+      state: 'fishes'
+    })
+  }
+
+  componentDidUpdate(){
+    localStorage.setItem(this.props.match.params.storeId, JSON.stringify(this.state.order))
+  }
+
+  componentWillUnmount(){
+    base.removeBinding(this.ref);
+  }
+
+  updateFish = (key, updatedFish) => {
+    //1. Take a copy of the current state
+    const fishes = { ...this.state.fishes };
+    //2. Update that state
+    fishes[key] = updatedFish;
+    //3. Set that to state
+    this.setState({ fishes });
   }
 
   loadSamplesFishes = () =>{
@@ -50,7 +82,7 @@ class App extends Component {
           </ul>
         </div>
         <Order fishes={this.state.fishes} order={this.state.order} />
-        <Inventory addFish={this.addFish} loadSampleFishes={this.loadSamplesFishes} />
+        <Inventory addFish={this.addFish} updateFish={this.updateFish} loadSampleFishes={this.loadSamplesFishes} fishes={this.state.fishes} />
       </div>
     )
   }

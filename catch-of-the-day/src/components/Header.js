@@ -1,4 +1,5 @@
-import React, { Component } from 'react'
+import React from 'react'
+import PropTypes from 'prop-types'
 
 // STATELESS COMPONENT BY VARIABLE RECEIVING A FUNCTION
 const Header = (props) => {
@@ -19,6 +20,9 @@ const Header = (props) => {
   )
 }
 
+Header.propTypes = {
+  tagline: PropTypes.string.isRequired
+}
 
 export default Header;
 
